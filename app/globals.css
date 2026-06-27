@@ -55,7 +55,35 @@
 }
 
 @media print {
+  /* Hide chrome — sidebar, topbar, panel, action bar */
+  aside,
+  header,
   .print-hide {
     display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  /* Full-form print — show everything */
+  body[data-print="print-form"] [data-section] {
+    display: block !important;
+  }
+
+  /* Lab-only print */
+  body[data-print="print-lab"] [data-section]:not([data-section="lab"]) {
+    display: none !important;
+  }
+  body[data-print="print-lab"] [data-section="lab"] {
+    display: block !important;
+  }
+
+  /* Animal/patient-only print */
+  body[data-print="print-animal"] [data-section]:not([data-section="animal"]) {
+    display: none !important;
+  }
+  body[data-print="print-animal"] [data-section="animal"] {
+    display: block !important;
   }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { Search, Bell, ChevronDown, Plus, SlidersHorizontal } from 'lucide-react'
+import { useCaseCtx } from '@/lib/case-context'
 
 const tabs = [
   { label: 'New Case', active: true },
@@ -11,10 +12,11 @@ const tabs = [
 ]
 
 export function Topbar() {
+  const { newCase } = useCaseCtx()
+
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-surface/80 px-4 py-3 backdrop-blur-md sm:px-6">
       <div className="flex items-center gap-3">
-        {/* Tabs */}
         <nav className="flex items-center gap-1 overflow-x-auto scroll-thin">
           {tabs.map((t) => (
             <button
@@ -35,7 +37,6 @@ export function Topbar() {
           ))}
         </nav>
 
-        {/* Search */}
         <div className="relative ml-auto hidden max-w-md flex-1 md:block">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-faint" />
           <input
@@ -52,14 +53,15 @@ export function Topbar() {
           <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-danger" />
         </button>
 
-        <button className="flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-hover">
+        <button
+          onClick={newCase}
+          className="flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-hover"
+        >
           <Plus className="size-4" /> New Case
         </button>
 
         <button className="hidden h-11 items-center gap-2 rounded-xl border border-border bg-surface px-2 pr-3 text-sm font-medium sm:flex">
-          <span className="flex size-7 items-center justify-center rounded-full bg-navy text-xs font-semibold text-white">
-            DR
-          </span>
+          <span className="flex size-7 items-center justify-center rounded-full bg-navy text-xs font-semibold text-white">DR</span>
           Doctor
           <ChevronDown className="size-4 text-faint" />
         </button>
