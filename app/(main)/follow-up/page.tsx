@@ -1,5 +1,3 @@
-'use client'
-
 import { PhoneCall, FileText, CheckCheck, RefreshCw, Clock4 } from 'lucide-react'
 
 interface FUCase {
