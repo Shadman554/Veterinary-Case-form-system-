@@ -7,6 +7,7 @@ import { useCaseCtx } from '@/lib/case-context'
 
 export function CaseMeta() {
   const { form } = useCaseCtx()
+  const [dateStr, setDateStr] = useState('')
   const [time, setTime] = useState('')
 
   useEffect(() => {
@@ -17,14 +18,14 @@ export function CaseMeta() {
       const ampm = h >= 12 ? 'PM' : 'AM'
       const h12 = h % 12 || 12
       setTime(`${h12}:${m} ${ampm}`)
+      setDateStr(
+        `${String(d.getDate()).padStart(2, '0')} / ${String(d.getMonth() + 1).padStart(2, '0')} / ${d.getFullYear()}`
+      )
     }
     tick()
     const id = setInterval(tick, 10000)
     return () => clearInterval(id)
   }, [])
-
-  const today = new Date()
-  const dateStr = `${String(today.getDate()).padStart(2, '0')} / ${String(today.getMonth() + 1).padStart(2, '0')} / ${today.getFullYear()}`
 
   const isSaved = form.status === 'Saved'
 
