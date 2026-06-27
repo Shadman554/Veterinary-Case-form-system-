@@ -74,9 +74,11 @@ function CheckChip({
 }
 
 const respiratoryOptions = [
-  'Appear normal', 'Rapid Breathing', 'Nasal discharge',
-  'Breathing Difficulty', 'Congestion', 'Coughing', 'Abnormal sound',
+  'Appear normal', 'Nasal discharge', 'Congestion', 'Abnormal sound',
+  'Rapid Breathing', 'Breathing Difficulty', 'Coughing', 'Other',
 ]
+
+const weightBcsOptions = ['Ideal Weight', 'Overweight', 'Underweight']
 const labOptions = [
   'CBC (Complete Blood Count)', 'Biochemistry', 'Urine Analyser', 'X-Ray',
   'Sonar', 'Viral Test', 'Skin Test', 'ESR', 'Fecal Sample', 'Fluid Therapy',
@@ -367,6 +369,20 @@ export function CaseForm() {
                   label={o}
                   checked={form.respiratory.has(o)}
                   onToggle={() => toggleSet('respiratory', o)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs font-medium text-muted">Weight / BCS</p>
+            <div className="flex flex-wrap gap-2">
+              {weightBcsOptions.map((o) => (
+                <CheckChip
+                  key={o}
+                  label={o}
+                  checked={form.weightBcs.has(o)}
+                  onToggle={() => toggleSet('weightBcs', o)}
                 />
               ))}
             </div>

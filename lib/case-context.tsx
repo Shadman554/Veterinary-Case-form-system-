@@ -30,6 +30,7 @@ export interface CaseData {
   respRate: string
   mentation: string
   respiratory: Set<string>
+  weightBcs: Set<string>
   doctor: string
   tech: string
   labs: Set<string>
@@ -73,6 +74,7 @@ const initialData = (): CaseData => ({
   respRate: '',
   mentation: 'BAR/QAR',
   respiratory: new Set(['Appear normal']),
+  weightBcs: new Set<string>(),
   doctor: '',
   tech: '',
   labs: new Set(['CBC (Complete Blood Count)']),
@@ -101,7 +103,7 @@ let caseCounter = 714
 interface CaseCtx {
   form: CaseData
   setField: <K extends keyof CaseData>(key: K, value: CaseData[K]) => void
-  toggleSet: (key: 'respiratory' | 'labs', value: string) => void
+  toggleSet: (key: 'respiratory' | 'labs' | 'weightBcs', value: string) => void
   savedCases: SavedCaseEntry[]
   saveCase: () => void
   loadCase: (entry: SavedCaseEntry) => void
@@ -154,7 +156,7 @@ export function CaseProvider({ children }: { children: ReactNode }) {
     setForm((prev) => ({ ...prev, [key]: value }))
   }, [])
 
-  const toggleSet = useCallback((key: 'respiratory' | 'labs', value: string) => {
+  const toggleSet = useCallback((key: 'respiratory' | 'labs' | 'weightBcs', value: string) => {
     setForm((prev) => {
       const next = new Set(prev[key])
       next.has(value) ? next.delete(value) : next.add(value)
