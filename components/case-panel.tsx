@@ -31,10 +31,14 @@ export function CasePanel() {
   }
 
   function handlePrint(section: 'form' | 'lab' | 'animal') {
-    const map = { form: 'print-form', lab: 'print-lab', animal: 'print-animal' }
-    document.body.setAttribute('data-print', map[section])
-    window.print()
-    document.body.removeAttribute('data-print')
+    const serialisable = {
+      ...form,
+      respiratory: [...form.respiratory],
+      weightBcs: [...form.weightBcs],
+      labs: [...form.labs],
+    }
+    localStorage.setItem('rv_print_case', JSON.stringify(serialisable))
+    window.open('/print', '_blank')
   }
 
   return (
