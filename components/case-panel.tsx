@@ -38,7 +38,7 @@ export function CasePanel() {
   }
 
   return (
-    <div className="flex w-72 shrink-0 flex-col gap-4 py-5 pr-5">
+    <div className="flex h-full flex-col gap-4 py-5 pl-0 pr-5">
       {/* Action buttons */}
       <Card className="overflow-hidden">
         <div className="p-3">

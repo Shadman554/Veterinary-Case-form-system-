@@ -35,6 +35,8 @@
   }
   html,
   body {
+    height: 100%;
+    overflow: hidden;
     background-color: var(--color-background);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;

@@ -21,8 +21,8 @@ export default function Page() {
             </div>
           </main>
 
-          {/* Right panel */}
-          <aside className="scroll-thin overflow-y-auto">
+          {/* Right panel — fixed height, internal scroll */}
+          <aside className="flex h-full w-72 shrink-0 flex-col overflow-hidden">
             <CasePanel />
           </aside>
         </div>
