@@ -1,52 +1,23 @@
 'use client'
 
-import { useState } from 'react'
-import { User, PawPrint, Stethoscope, ShieldCheck, PenLine, Cat, Dog, Bird, Rabbit, Printer, Save, CircleArrowRight } from 'lucide-react'
+import { useState, useId, useEffect } from 'react'
+import { User, PawPrint, Stethoscope, ShieldCheck, PenLine, Cat, Dog, Bird, Rabbit, Printer, Save, CircleArrowRight, Hash } from 'lucide-react'
 import { Section, Field, inputClasses } from '@/components/ui'
 
-/* ── Reuse exact same pill pattern as case-form.tsx ── */
-function Pills({
-  options,
-  value,
-  onChange,
-}: {
-  options: string[]
-  value: string
-  onChange: (v: string) => void
-}) {
+/* ── Exact same toggle pattern as case-form.tsx ── */
+function SegToggle({ options, value, onChange }: { options: string[]; value: string; onChange: (v: string) => void }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex rounded-xl border border-border bg-input p-1">
       {options.map((o) => (
         <button
           key={o}
           type="button"
-          onClick={() => onChange(value === o ? '' : o)}
-          className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
-            value === o
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-border bg-input text-muted hover:border-primary/40 hover:text-foreground'
+          onClick={() => onChange(o)}
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${
+            value === o ? 'bg-surface text-primary shadow-sm' : 'text-muted hover:text-foreground'
           }`}
         >
           {o}
-        </button>
-      ))}
-    </div>
-  )
-}
-
-function YesNo({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  return (
-    <div className="flex rounded-xl border border-border bg-input p-1">
-      {['Yes', 'No'].map((v) => (
-        <button
-          key={v}
-          type="button"
-          onClick={() => onChange(v)}
-          className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${
-            value === v ? 'bg-surface text-primary shadow-sm' : 'text-muted'
-          }`}
-        >
-          {v}
         </button>
       ))}
     </div>
@@ -57,390 +28,294 @@ interface FD {
   formNo: string
   ownerName: string; ownerPhone: string; ownerAddress: string
   patientName: string; stray: boolean; species: string; breed: string
-  microchip: string; ageYr: string; ageMo: string; gender: string
+  microchip: string; age: string; ageUnit: string; gender: string
   weight: string; neutered: string; vaccinated: string
   typeOfOperation: string; doctor: string; technician: string
   anesthesiaDosage: string; fastingDuration: string
   opTimeStart: string; opTimeEnd: string
-  previousSurgery: string; illness: string; allergyAnesthesia: string
+  previousHistory: string; allergyAnesthesia: string
   labTestDeclined: boolean
 }
 
 const BLANK: FD = {
   formNo: '', ownerName: '', ownerPhone: '', ownerAddress: '',
   patientName: '', stray: false, species: '', breed: '', microchip: '',
-  ageYr: '', ageMo: '', gender: '', weight: '',
+  age: '', ageUnit: 'Year', gender: '', weight: '',
   neutered: '', vaccinated: '',
   typeOfOperation: '', doctor: '', technician: '',
-  anesthesiaDosage: '', fastingDuration: '',
-  opTimeStart: '', opTimeEnd: '',
-  previousSurgery: '', illness: '', allergyAnesthesia: '',
+  anesthesiaDosage: '', fastingDuration: '', opTimeStart: '', opTimeEnd: '',
+  previousHistory: '', allergyAnesthesia: '',
   labTestDeclined: false,
 }
 
 export default function ConsentPage() {
   const [fd, setFd] = useState<FD>({ ...BLANK })
+  const labId = useId()
 
   function set<K extends keyof FD>(k: K, v: FD[K]) {
     setFd((p) => ({ ...p, [k]: v }))
   }
 
-  const today = new Date()
-  const dateStr = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`
+  const [dateStr, setDateStr] = useState('')
+  const [timeStr, setTimeStr] = useState('')
+  useEffect(() => {
+    const now = new Date()
+    setDateStr(`${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`)
+    setTimeStr(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }))
+  }, [])
 
   return (
     <main className="scroll-thin flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-2xl space-y-5 px-4 pb-10 pt-5 sm:px-6">
+      <div className="mx-auto max-w-2xl px-4 pb-12 pt-5 sm:px-6">
 
-        {/* Action bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Consent Form</h1>
-            <p className="mt-0.5 text-sm text-muted">{dateStr}</p>
+        {/* ── Document header ── */}
+        <div className="mb-6 overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.10)]">
+          {/* Dark top band */}
+          <div className="flex items-center justify-between bg-navy px-5 py-4">
+            <div className="flex items-center gap-3">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-success text-lg">🏥</span>
+              <div>
+                <div className="text-sm font-bold text-white">Royal Veterinary Hospital</div>
+                <div className="text-[11px] text-white/50">Surgery Consent Form · فۆرمی رەزامەندی نەشتەرگەری</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-[11px] text-white/40">Date / Time</div>
+              <div className="text-xs font-semibold text-white">{dateStr} · {timeStr}</div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="flex h-10 items-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-4 text-sm font-semibold text-primary transition hover:bg-primary/20">
-              <CircleArrowRight className="size-4" /> Post-Surgery Case
-            </button>
-            <button onClick={() => window.print()} className="flex h-10 items-center gap-2 rounded-xl border border-border bg-surface px-4 text-sm font-medium text-muted transition hover:bg-input">
-              <Printer className="size-4" /> Print
-            </button>
-            <button className="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow shadow-primary/20 transition hover:bg-primary-hover">
-              <Save className="size-4" /> Save
-            </button>
+
+          {/* Form no + actions */}
+          <div className="flex items-center gap-4 border-t border-border px-5 py-3">
+            <div className="flex items-center gap-2">
+              <Hash className="size-4 text-faint" />
+              <input
+                value={fd.formNo}
+                onChange={(e) => set('formNo', e.target.value)}
+                placeholder="Form No."
+                className="w-28 bg-transparent text-sm font-semibold text-foreground outline-none placeholder:font-normal placeholder:text-faint"
+              />
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <button className="flex h-8 items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 text-xs font-semibold text-primary transition hover:bg-primary/20">
+                <CircleArrowRight className="size-3.5" /> Post-Surgery
+              </button>
+              <button onClick={() => window.print()} className="flex h-8 items-center gap-1.5 rounded-lg border border-border px-3 text-xs font-medium text-muted transition hover:bg-input">
+                <Printer className="size-3.5" /> Print
+              </button>
+              <button className="flex h-8 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-white shadow-sm shadow-primary/25 transition hover:bg-primary-hover">
+                <Save className="size-3.5" /> Save Form
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* 1. Owner Details */}
-        <Section title="Owner Details" icon={User} accent="primary">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Owner Name" required>
-              <input
-                className={inputClasses}
-                placeholder="Full name"
-                value={fd.ownerName}
-                onChange={(e) => set('ownerName', e.target.value)}
-              />
-            </Field>
-            <Field label="Contact Info">
-              <input
-                className={inputClasses}
-                placeholder="07XX XXX XXXX"
-                value={fd.ownerPhone}
-                onChange={(e) => set('ownerPhone', e.target.value)}
-              />
-            </Field>
-            <Field label="Address" className="col-span-full">
-              <input
-                className={inputClasses}
-                placeholder="City, district, street"
-                value={fd.ownerAddress}
-                onChange={(e) => set('ownerAddress', e.target.value)}
-              />
-            </Field>
-          </div>
-        </Section>
+        {/* ── Sections ── */}
+        <div className="space-y-5">
 
-        {/* 2. Patient Details */}
-        <Section title="Patient Details" icon={PawPrint} accent="success">
-          <div className="space-y-5">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Field label="Patient Name" required>
-                <input
-                  className={inputClasses}
-                  placeholder="Pet name"
-                  value={fd.patientName}
-                  onChange={(e) => set('patientName', e.target.value)}
-                />
+          {/* 1. Owner */}
+          <Section title="Owner Details" icon={User} accent="primary">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Owner Name" required>
+                <input className={inputClasses} placeholder="Full name" value={fd.ownerName} onChange={(e) => set('ownerName', e.target.value)} />
               </Field>
-              <Field label="Breed">
-                <input
-                  className={inputClasses}
-                  placeholder="e.g. Persian, Labrador"
-                  value={fd.breed}
-                  onChange={(e) => set('breed', e.target.value)}
-                />
+              <Field label="Contact Info">
+                <input className={inputClasses} placeholder="07XX XXX XXXX" value={fd.ownerPhone} onChange={(e) => set('ownerPhone', e.target.value)} />
               </Field>
-              <Field label="Microchip No.">
-                <input
-                  className={inputClasses}
-                  placeholder="Chip ID (optional)"
-                  value={fd.microchip}
-                  onChange={(e) => set('microchip', e.target.value)}
-                />
+              <Field label="Address" className="col-span-full">
+                <input className={inputClasses} placeholder="City, district, street" value={fd.ownerAddress} onChange={(e) => set('ownerAddress', e.target.value)} />
               </Field>
             </div>
+          </Section>
 
-            {/* Species pills */}
-            <div>
-              <p className="mb-2 text-xs font-medium text-muted">Species</p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: 'Cat', icon: Cat },
-                  { label: 'Dog', icon: Dog },
-                  { label: 'Bird', icon: Bird },
-                  { label: 'Other', icon: Rabbit },
-                ].map(({ label, icon: Icon }) => {
-                  const active = fd.species === label
-                  return (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => set('species', active ? '' : label)}
-                      className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
-                        active
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-border bg-input text-muted hover:border-primary/40 hover:text-foreground'
-                      }`}
-                    >
-                      <Icon className="size-4" />
-                      {label}
-                    </button>
-                  )
-                })}
+          {/* 2. Patient */}
+          <Section title="Patient Details" icon={PawPrint} accent="success">
+            <div className="space-y-5">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <Field label="Patient Name" required>
+                  <input className={inputClasses} placeholder="Pet name" value={fd.patientName} onChange={(e) => set('patientName', e.target.value)} />
+                </Field>
+                <Field label="Breed">
+                  <input className={inputClasses} placeholder="e.g. Persian, Labrador" value={fd.breed} onChange={(e) => set('breed', e.target.value)} />
+                </Field>
+                <Field label="Microchip No.">
+                  <input className={inputClasses} placeholder="Chip ID" value={fd.microchip} onChange={(e) => set('microchip', e.target.value)} />
+                </Field>
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs font-medium text-muted">Species</p>
+                <div className="flex flex-wrap gap-2">
+                  {([['Cat', Cat], ['Dog', Dog], ['Bird', Bird], ['Other', Rabbit]] as const).map(([label, Icon]) => {
+                    const active = fd.species === label
+                    return (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => set('species', active ? '' : label)}
+                        className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
+                          active
+                            ? 'border-primary bg-primary/10 text-primary'
+                            : 'border-border bg-input text-muted hover:border-primary/40 hover:text-foreground'
+                        }`}
+                      >
+                        <Icon className="size-4" />{label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <Field label="Age">
+                  <div className="flex gap-2">
+                    <input className={inputClasses} placeholder="0" type="number" value={fd.age} onChange={(e) => set('age', e.target.value)} />
+                    <div className="flex rounded-xl border border-border bg-input p-1">
+                      {['Yr', 'Mo'].map((u) => (
+                        <button key={u} type="button" onClick={() => set('ageUnit', u === 'Yr' ? 'Year' : 'Month')}
+                          className={`rounded-lg px-3 text-xs font-medium transition ${fd.ageUnit === (u === 'Yr' ? 'Year' : 'Month') ? 'bg-surface text-primary shadow-sm' : 'text-muted'}`}>
+                          {u}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </Field>
+
+                <Field label="Weight">
+                  <div className="relative">
+                    <input className={inputClasses} placeholder="0.0" type="number" value={fd.weight} onChange={(e) => set('weight', e.target.value)} />
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-faint">Kg</span>
+                  </div>
+                </Field>
+
+                <Field label="Gender">
+                  <SegToggle options={['Male', 'Female']} value={fd.gender} onChange={(v) => set('gender', v)} />
+                </Field>
+
+                <div className="flex items-end">
+                  <label className="flex h-11 w-full cursor-pointer items-center gap-2 rounded-xl border border-border bg-input px-3.5 text-sm font-medium text-muted">
+                    <input type="checkbox" className="size-4 accent-primary" checked={fd.stray} onChange={(e) => set('stray', e.target.checked)} />
+                    Stray
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Neutered / Spayed">
+                  <SegToggle options={['Yes', 'No']} value={fd.neutered} onChange={(v) => set('neutered', v)} />
+                </Field>
+                <Field label="Vaccinated">
+                  <SegToggle options={['Yes', 'No']} value={fd.vaccinated} onChange={(v) => set('vaccinated', v)} />
+                </Field>
               </div>
             </div>
+          </Section>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Field label="Age">
-                <div className="flex gap-2">
-                  <input
-                    className={inputClasses}
-                    placeholder="0"
-                    type="number"
-                    value={fd.ageYr}
-                    onChange={(e) => set('ageYr', e.target.value)}
-                  />
-                  <div className="flex rounded-xl border border-border bg-input p-1">
-                    {['Yr', 'Mo'].map((u) => (
-                      <button
-                        key={u}
-                        type="button"
-                        className="rounded-lg px-3 text-xs font-medium text-muted"
-                      >
-                        {u}
-                      </button>
-                    ))}
+          {/* 3. Medical History */}
+          <Section title="Previous History & Allergies" icon={PenLine} accent="primary">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Previous Surgeries / Illnesses">
+                <textarea rows={3} className={`${inputClasses} h-auto resize-none py-3`}
+                  placeholder="Previous surgeries, illnesses, drug history..."
+                  value={fd.previousHistory} onChange={(e) => set('previousHistory', e.target.value)} />
+              </Field>
+              <Field label="Drug / Anesthesia Allergies">
+                <textarea rows={3} className={`${inputClasses} h-auto resize-none py-3`}
+                  placeholder="Any known allergies..."
+                  value={fd.allergyAnesthesia} onChange={(e) => set('allergyAnesthesia', e.target.value)} />
+              </Field>
+            </div>
+          </Section>
+
+          {/* 4. Surgery */}
+          <Section title="Surgery Details" icon={Stethoscope} accent="navy">
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="By Dr.">
+                  <select className={inputClasses} value={fd.doctor} onChange={(e) => set('doctor', e.target.value)}>
+                    <option value="">— Select Doctor —</option>
+                    {['Gullan', 'Gyan', 'Othman', 'Shania', 'Tablo'].map((d) => <option key={d}>{d}</option>)}
+                  </select>
+                </Field>
+                <Field label="By Technician">
+                  <select className={inputClasses} value={fd.technician} onChange={(e) => set('technician', e.target.value)}>
+                    <option value="">— Select Technician —</option>
+                    {['Halwest', 'Mohammed', 'Shadman'].map((t) => <option key={t}>{t}</option>)}
+                  </select>
+                </Field>
+              </div>
+              <Field label="Type of Operation" required>
+                <input className={inputClasses} placeholder="Describe the procedure…" value={fd.typeOfOperation} onChange={(e) => set('typeOfOperation', e.target.value)} />
+              </Field>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Field label="Anaesthesia Dosage">
+                  <input className={inputClasses} placeholder="e.g. 0.3× Kg" value={fd.anesthesiaDosage} onChange={(e) => set('anesthesiaDosage', e.target.value)} />
+                </Field>
+                <Field label="Fasting Duration">
+                  <input className={inputClasses} placeholder="e.g. 10 hrs" value={fd.fastingDuration} onChange={(e) => set('fastingDuration', e.target.value)} />
+                </Field>
+                <Field label="Operation Time">
+                  <div className="flex gap-2">
+                    <input className={`${inputClasses} text-center`} placeholder="Start" value={fd.opTimeStart} onChange={(e) => set('opTimeStart', e.target.value)} />
+                    <input className={`${inputClasses} text-center`} placeholder="End" value={fd.opTimeEnd} onChange={(e) => set('opTimeEnd', e.target.value)} />
+                  </div>
+                </Field>
+              </div>
+            </div>
+          </Section>
+
+          {/* 5. Consent */}
+          <Section title="Consent Agreement" icon={ShieldCheck} accent="warning">
+            <div className="space-y-3">
+              <div className="rounded-xl border border-success/20 bg-success/5 px-4 py-3.5">
+                <p className="text-right text-[12.5px] leading-7 text-foreground" dir="rtl">
+                  من وەک خاوەنی ئەم ئاژەڵەی کە لەم فۆرمەدا ناو و زانیاریەکانی نوسراوە، ڕەزامەندی خۆم دەدەم بە ستافی نەخۆشخانەی ڤێتیرنەری ڕۆیاڵ، بۆ ئەنجامدانی نەشتەرگەری لەژێر هۆشبەری گشتی و کاری پێویست بۆ ئاژەڵەکەم. وە هەروەها ڕوونکردنەوەی تەواوم پێدراوە سەبارەت بە مەترسیەکانی نەشتەرگەریەکە.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-input px-4 py-3.5">
+                <p className="text-[12.5px] leading-6 text-foreground">
+                  I, as the owner of the animal named on this form, give my consent to the staff of Royal Veterinary Hospital to perform surgery under general anesthesia and any necessary procedures. I have been fully informed of the surgery, its reason, and the associated risks including sensitivity to anesthesia, bleeding, infection, and post-operative complications.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-surface px-4 py-3.5">
+                <p className="text-right text-[12.5px] leading-6 text-foreground" dir="rtl">
+                  أنا، باعتباري مالك الحيوان المذكور في هذا النموذج، أمنح موافقتي لموظفي المستشفى البيطري رۆیاڵ لإجراء العملية الجراحية تحت التخدير العام وأي إجراءات ضرورية، وقد أُبلغت بجميع المخاطر المحتملة.
+                </p>
+              </div>
+              <label htmlFor={labId} className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-input px-4 py-3">
+                <input id={labId} type="checkbox" checked={fd.labTestDeclined}
+                  onChange={(e) => set('labTestDeclined', e.target.checked)}
+                  className="mt-0.5 size-4 cursor-pointer accent-success" />
+                <span className="text-[12.5px] leading-relaxed text-foreground" dir="rtl">
+                  لەسەر ڕەزامەندی خۆی نەیویستوە پشکنینی تاقیگەیی بۆ بکرێت
+                  <span className="ml-2 text-xs text-muted not-italic" dir="ltr">· Owner declined lab test</span>
+                </span>
+              </label>
+            </div>
+          </Section>
+
+          {/* 6. Signatures */}
+          <Section title="Signatures" icon={PenLine} accent="navy">
+            <div className="grid gap-5 sm:grid-cols-2">
+              {[
+                { label: "Owner's Signature", sub: 'إمضاء صاحب الحيوان' },
+                { label: "Doctor's Signature", sub: 'إمضاء الطبيب' },
+              ].map(({ label, sub }) => (
+                <div key={label}>
+                  <button className="flex h-24 w-full flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed border-border bg-input text-muted transition hover:border-success/50 hover:bg-success/5 hover:text-success">
+                    <PenLine className="size-5" />
+                    <span className="text-xs font-medium">Tap to sign</span>
+                  </button>
+                  <div className="mt-2">
+                    <div className="text-sm font-semibold text-foreground">{label}</div>
+                    <div className="text-xs text-faint">{sub}</div>
                   </div>
                 </div>
-              </Field>
-
-              <Field label="Weight">
-                <div className="relative">
-                  <input
-                    className={inputClasses}
-                    placeholder="0.0"
-                    type="number"
-                    value={fd.weight}
-                    onChange={(e) => set('weight', e.target.value)}
-                  />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-faint">Kg</span>
-                </div>
-              </Field>
-
-              <Field label="Gender">
-                <div className="flex rounded-xl border border-border bg-input p-1">
-                  {['Male', 'Female'].map((g) => (
-                    <button
-                      key={g}
-                      type="button"
-                      onClick={() => set('gender', g)}
-                      className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${
-                        fd.gender === g ? 'bg-surface text-primary shadow-sm' : 'text-muted'
-                      }`}
-                    >
-                      {g}
-                    </button>
-                  ))}
-                </div>
-              </Field>
-
-              <div className="flex items-end">
-                <label className="flex h-11 w-full cursor-pointer items-center gap-2 rounded-xl border border-border bg-input px-3.5 text-sm font-medium text-muted">
-                  <input
-                    type="checkbox"
-                    className="size-4 accent-primary"
-                    checked={fd.stray}
-                    onChange={(e) => set('stray', e.target.checked)}
-                  />
-                  Stray animal
-                </label>
-              </div>
+              ))}
             </div>
+          </Section>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Neutered / Spayed">
-                <YesNo value={fd.neutered} onChange={(v) => set('neutered', v)} />
-              </Field>
-              <Field label="Vaccinated">
-                <YesNo value={fd.vaccinated} onChange={(v) => set('vaccinated', v)} />
-              </Field>
-            </div>
-          </div>
-        </Section>
-
-        {/* 3. Medical History */}
-        <Section title="Medical History" icon={PenLine} accent="primary">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Previous Surgeries / Illnesses">
-              <textarea
-                rows={3}
-                className={`${inputClasses} h-auto resize-none py-3`}
-                placeholder="List any previous surgeries, illnesses..."
-                value={fd.previousSurgery}
-                onChange={(e) => set('previousSurgery', e.target.value)}
-              />
-            </Field>
-            <Field label="Drug / Anesthesia Allergies">
-              <textarea
-                rows={3}
-                className={`${inputClasses} h-auto resize-none py-3`}
-                placeholder="Any known drug or anesthesia allergies..."
-                value={fd.allergyAnesthesia}
-                onChange={(e) => set('allergyAnesthesia', e.target.value)}
-              />
-            </Field>
-          </div>
-        </Section>
-
-        {/* 4. Surgery Details */}
-        <Section title="Surgery Details" icon={Stethoscope} accent="navy">
-          <div className="space-y-5">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="By Dr.">
-                <select
-                  className={inputClasses}
-                  value={fd.doctor}
-                  onChange={(e) => set('doctor', e.target.value)}
-                >
-                  <option value="">— Select Doctor —</option>
-                  <option>Gullan</option>
-                  <option>Gyan</option>
-                  <option>Othman</option>
-                  <option>Shania</option>
-                  <option>Tablo</option>
-                </select>
-              </Field>
-              <Field label="By Technician">
-                <select
-                  className={inputClasses}
-                  value={fd.technician}
-                  onChange={(e) => set('technician', e.target.value)}
-                >
-                  <option value="">— Select Technician —</option>
-                  <option>Halwest</option>
-                  <option>Mohammed</option>
-                  <option>Shadman</option>
-                </select>
-              </Field>
-            </div>
-
-            <Field label="Type of Operation" required>
-              <input
-                className={inputClasses}
-                placeholder="Describe the procedure..."
-                value={fd.typeOfOperation}
-                onChange={(e) => set('typeOfOperation', e.target.value)}
-              />
-            </Field>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              <Field label="Anaesthesia Dosage">
-                <input
-                  className={inputClasses}
-                  placeholder="e.g. 0.3× Kg"
-                  value={fd.anesthesiaDosage}
-                  onChange={(e) => set('anesthesiaDosage', e.target.value)}
-                />
-              </Field>
-              <Field label="Fasting Duration">
-                <input
-                  className={inputClasses}
-                  placeholder="e.g. 10 hrs"
-                  value={fd.fastingDuration}
-                  onChange={(e) => set('fastingDuration', e.target.value)}
-                />
-              </Field>
-              <Field label="Operation Time">
-                <div className="flex items-center gap-1.5">
-                  <input
-                    className="h-11 w-full rounded-xl border border-border bg-input px-3 text-center text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"
-                    placeholder="Start"
-                    value={fd.opTimeStart}
-                    onChange={(e) => set('opTimeStart', e.target.value)}
-                  />
-                  <span className="shrink-0 text-xs text-faint">→</span>
-                  <input
-                    className="h-11 w-full rounded-xl border border-border bg-input px-3 text-center text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"
-                    placeholder="End"
-                    value={fd.opTimeEnd}
-                    onChange={(e) => set('opTimeEnd', e.target.value)}
-                  />
-                </div>
-              </Field>
-            </div>
-          </div>
-        </Section>
-
-        {/* 5. Consent Agreement */}
-        <Section title="Consent Agreement" icon={ShieldCheck} accent="warning">
-          <div className="space-y-4">
-            {/* Kurdish */}
-            <div className="rounded-xl border border-success/20 bg-success/5 p-4">
-              <p className="text-right text-[13px] leading-loose text-foreground" dir="rtl">
-                من وەک خاوەنی ئەم ئاژەڵەی کە لەم فۆرمەدا ناو و زانیاریەکانی نوسراوە، وە لە خوارەوەی ئەم لاپەڕەیە ناو ئیمزای خۆم کردووە، ڕەزامەندی خۆم دەدەم بە ستافی نەخۆشخانەی ڤێتیرنەری ڕۆیاڵ، بۆ ئەنجامدانی نەشتەرگەری لەژێر هۆشبەری گشتی (بنج عام) و کاری پێویست بۆ ئاژەڵەکەم.
-                <br /><br />
-                وە هەروەها من ڕوونکردنەوەی تەواوم پێدراوە سەبارەت بە نەشتەرگەریەکە و هۆکاری ئەنجامدانی نەشتەرگەریەکە و ئەو مەترسیانەی کە لەوانەیە بەهۆی ئەم نەشتەرگەریە یاخود هۆشبڕی گشتی توشی ئاژەڵەکەم ببێت.
-              </p>
-            </div>
-
-            {/* English */}
-            <div className="rounded-xl border border-border bg-input p-4">
-              <p className="text-[13px] leading-relaxed text-foreground">
-                I, as the owner of the animal whose name and information are written on this form, and signed at the bottom of this page, give my consent to the staff of the Royal Veterinary Hospital, to perform surgery under general anesthesia and any necessary procedures for my animal.
-                <br /><br />
-                I have also been given a full explanation of the surgery, the reason for the surgery and the risks that may result from this surgery or general anesthesia, including (sensitivity to general anesthesia, death, bleeding, infection, slow wound healing, severe pain, behavioral changes).
-              </p>
-            </div>
-
-            {/* Arabic */}
-            <div className="rounded-xl border border-border bg-surface p-4">
-              <p className="text-right text-[13px] leading-loose text-foreground" dir="rtl">
-                أنا، باعتباري مالك الحيوان الذي كتب اسمه ومعلوماته في هذا النموذج، ووقعت في أسفل هذه الصفحة، أمنح موافقتي لموظفي المستشفى البيطري رۆیاڵ، لإجراء عملية جراحية تحت التخدير العام وأي إجراءات ضرورية لحيواني.
-              </p>
-            </div>
-
-            {/* Lab declined */}
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-input px-4 py-3">
-              <input
-                type="checkbox"
-                checked={fd.labTestDeclined}
-                onChange={(e) => set('labTestDeclined', e.target.checked)}
-                className="mt-0.5 size-4 cursor-pointer accent-success"
-              />
-              <span className="text-[13px] leading-relaxed text-foreground" dir="rtl">
-                لەسەر ڕەزامەندی خۆی نەیویستوە پشکنینی تاقیگەیی بۆ بکرێت
-                <span className="ml-2 text-muted not-italic" dir="ltr">(Owner declined lab test)</span>
-              </span>
-            </label>
-          </div>
-        </Section>
-
-        {/* 6. Signatures */}
-        <Section title="Signatures" icon={PenLine} accent="navy">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {["Owner's Signature", "Doctor's Signature"].map((label) => (
-              <div key={label}>
-                <div className="flex h-28 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-input text-muted transition hover:border-success/50 hover:text-success">
-                  <PenLine className="size-6" />
-                  <span className="text-sm font-medium">Tap to sign</span>
-                </div>
-                <p className="mt-2 text-sm font-semibold text-foreground">{label}</p>
-              </div>
-            ))}
-          </div>
-        </Section>
-
+        </div>
       </div>
     </main>
   )
