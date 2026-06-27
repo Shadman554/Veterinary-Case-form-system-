@@ -22,7 +22,7 @@ export default function Page() {
           </main>
 
           {/* Right panel */}
-          <aside className="scroll-thin hidden overflow-y-auto lg:block">
+          <aside className="scroll-thin overflow-y-auto">
             <CasePanel />
           </aside>
         </div>
